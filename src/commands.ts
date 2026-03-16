@@ -2,6 +2,7 @@ import { Command, App, parseFrontMatterEntry, parseFrontMatterTags, Modal } from
 import { PDFSelectionModal, BibEditModal, chainBibEditModals, ExportCitationModal } from 'src/modals';
 import { getLinkedLiteratureNotes, isLiteratureNote, openPDFExternal } from 'src/functions';
 import { MyLiteratureTags, MyLiteratureFrontmatter } from './config';
+import { SmartLinkAliasPlugin } from './plugin';
 
 
 export const commandMarkPaperRead : (app: App) => Command = (app) => { 
@@ -197,6 +198,30 @@ export const commandExportBib : (app : App) => Command = (app) => {
 
                 resolve(null);
             });            
+		}
+	}
+}
+
+export const commandZoteroServerStart : (plugin : SmartLinkAliasPlugin) => Command = (plugin) => {
+    return {
+		id: 'zotero-server-start',
+		name: 'Zotero Start',
+		checkCallback: (checking) => {
+			if (checking)
+				return !plugin.zoteroServer.running;
+			plugin.zoteroServer.start();
+		}
+	}
+}
+
+export const commandZoteroServerStop : (plugin : SmartLinkAliasPlugin) => Command = (plugin) => {
+	return {
+		id: 'zotero-server-stop',
+		name: 'Zotero Stop',
+		checkCallback: (checking) => {
+			if (checking)
+				return plugin.zoteroServer.running;
+			plugin.zoteroServer.stop();
 		}
 	}
 }

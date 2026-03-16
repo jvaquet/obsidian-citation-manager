@@ -1,6 +1,6 @@
 import { App, ButtonComponent, FuzzySuggestModal, Modal, parseFrontMatterEntry, Setting, TextAreaComponent, TextComponent, TFile } from "obsidian";
 import { cbValidateBib, openPDFExternal, setBibPath } from 'src/functions';
-import { MyLiteratureFrontmatter, PATH_ATTACHMENTS } from "./config";
+import { MyLiteratureFrontmatter, MyLiteraturePaths } from "./config";
 
 
 export class PDFSelectionModal extends FuzzySuggestModal<TFile> {
@@ -62,7 +62,7 @@ export class BibEditModal extends Modal {
 
         let bibPath: string | null = parseFrontMatterEntry(metadata?.frontmatter, MyLiteratureFrontmatter.BIB_PATH);
         if (!bibPath) {
-            bibPath = PATH_ATTACHMENTS + '/' + citekey + '.bib';
+            bibPath = MyLiteraturePaths.BIB + '/' + citekey + '.bib';
             setBibPath(this.app, this.literatureNote, bibPath);
         }
 
@@ -161,3 +161,50 @@ export class ExportCitationModal extends Modal {
 
 }
 
+
+export const confirmOverride = async (app: App, message: string) => {
+    const override: boolean = await new Promise((resolve) => {
+        new ConfirmOverrideModal(app, message, resolve).open();
+    });
+    return override;
+}
+
+class ConfirmOverrideModal extends Modal {
+
+    private onSubmit: (result: boolean) => void;
+    private message: string;
+
+    constructor(app: App, message: string, onSubmit: (result: boolean) => void) {
+        super(app);
+        this.onSubmit = onSubmit;
+        this.message = message;
+    }
+
+  onOpen() {
+    const { contentEl } = this;
+
+    // Title / message
+    contentEl.createEl("h2", { text: this.message });
+
+    // Buttons container
+    new Setting(contentEl)
+      .addButton(btn => btn
+        .setButtonText('Overwrite')
+        .onClick(() => {
+          this.onSubmit(true);
+          this.close();
+        }))
+      .addButton(btn => btn
+        .setButtonText('Abort')
+        .setCta()
+        .onClick(() => {
+          this.onSubmit(false);
+          this.close();
+        }));
+  }
+
+  onClose() {
+    this.onSubmit(false);
+    this.contentEl.empty();
+  }
+}

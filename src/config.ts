@@ -10,7 +10,18 @@ export enum MyLiteratureFrontmatter {
     IS_LITERATURE_NOTE = 'my_literature_note',
     PDF_PATH = 'pdf',
     BIB_PATH = 'bibtex',
-    DISPLAY_NAMES = 'display-titles'
+    DISPLAY_NAMES = 'display-titles',
+    TITLE = 'title',
+    AUTHOR = 'author',
+    YEAR = 'year',
+    DOI = 'doi',
+    AUTHORS = 'authors'
 }
 
-export const PATH_ATTACHMENTS = 'attachments'
+export enum MyLiteraturePaths {
+    NOTES = 'literature',
+    PDFS = 'literature/attachments/pdf',
+    BIB = 'literature/attachments/bib'
+}
+
+export const getNewLiteratureNoteContents = (citekey: string, title: string) => `# [[${citekey}.pdf|${title}]]\n`

@@ -2,15 +2,31 @@ import { Plugin } from 'obsidian';
 import { getLinkDecorationsStateField } from './link-decorations.field';
 import { Prec } from '@codemirror/state';
 
-import { commandCheckBib, commandExportBib, commandMarkPaperRead, commandMarkPaperUnread, commandOpenBib, commandOpenPaperPDF, commandUpdateBib } from 'src/commands'
-import { getLinkDisplayName } from './functions';
+import { commandCheckBib, commandExportBib, commandMarkPaperRead, commandMarkPaperUnread, commandOpenBib, commandOpenPaperPDF, commandUpdateBib, commandZoteroServerStart, commandZoteroServerStop } from 'src/commands'
+import { getHandleZoteroAttachment, getHandleZoteroItem, getLinkDisplayName, writeBib } from './functions';
+import { ConnectorServer } from './zotero/zotero-connector-server';
 
 
-
-
+// TODO: Rename plugin
 export class SmartLinkAliasPlugin extends Plugin {
 
+	zoteroServer: ConnectorServer;
+
 	async onload() {
+
+		this.zoteroServer = new ConnectorServer(this.app);
+
+		// Register Zotero server event listeners
+		const handleZoteroItem = getHandleZoteroItem(this.app);
+		const handleZoteroAttachment = getHandleZoteroAttachment(this.app);
+        document.addEventListener('zotero-item-received', handleZoteroItem);
+        document.addEventListener('zotero-additional-attachments', handleZoteroAttachment);
+
+		this.register(() => {
+            document.removeEventListener('zotero-item-received', handleZoteroItem);
+            document.removeEventListener('zotero-additional-attachments', handleZoteroAttachment);
+        });
+
 
 		// Enable opening bib files
 		this.registerExtensions(['bib'], 'markdown')
@@ -23,6 +39,9 @@ export class SmartLinkAliasPlugin extends Plugin {
 		this.addCommand(commandOpenBib(this.app))
 		this.addCommand(commandCheckBib(this.app))
 		this.addCommand(commandExportBib(this.app))
+
+		this.addCommand(commandZoteroServerStart(this))
+		this.addCommand(commandZoteroServerStop(this))
 
 
 		// Register StateField Code Mirror extension for showing links on edit mode
