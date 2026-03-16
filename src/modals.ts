@@ -180,31 +180,31 @@ class ConfirmOverrideModal extends Modal {
         this.message = message;
     }
 
-  onOpen() {
-    const { contentEl } = this;
+    onOpen() {
+        const { contentEl } = this;
 
-    // Title / message
-    contentEl.createEl("h2", { text: this.message });
+        // Title / message
+        contentEl.createEl("h2", { text: this.message });
 
-    // Buttons container
-    new Setting(contentEl)
-      .addButton(btn => btn
-        .setButtonText('Overwrite')
-        .onClick(() => {
-          this.onSubmit(true);
-          this.close();
-        }))
-      .addButton(btn => btn
-        .setButtonText('Abort')
-        .setCta()
-        .onClick(() => {
-          this.onSubmit(false);
-          this.close();
-        }));
-  }
+        // Buttons container
+        new Setting(contentEl)
+        .addButton(btn => btn
+            .setButtonText('Overwrite')
+            .onClick(() => {
+            this.onSubmit(true);
+            this.close();
+            }))
+        .addButton(btn => btn
+            .setButtonText('Abort')
+            .setCta()
+            .onClick(() => {
+            this.onSubmit(false);
+            this.close();
+            }));
+    }
 
-  onClose() {
-    this.onSubmit(false);
-    this.contentEl.empty();
-  }
+    onClose() {
+        this.onSubmit(false);
+        this.contentEl.empty();
+    }
 }
