@@ -152,6 +152,8 @@ export const commandCheckBib : (app : App) => Command = (app) => {
             const literatureNotes = linkedLiteratureNotes.filter((literatureNote) => {
                 const frontmatter = app.metadataCache.getFileCache(literatureNote)?.frontmatter;
                 const tags = parseFrontMatterTags(frontmatter) ?? [];
+                console.log(tags)
+                return !tags.contains(`#${MyLiteratureTags.BIB_VALIDATED}`);
             });
 
             if (literatureNotes.length == 0)
