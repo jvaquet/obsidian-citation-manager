@@ -18,8 +18,10 @@ export class PDFSelectionModal extends FuzzySuggestModal<TFile> {
 
     getItemText(file: TFile): string {
         const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-        const title = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.DISPLAY_NAMES).full ?? file.basename;
-        return title;
+        const title = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.TITLE) ?? file.basename;
+        const author = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.AUTHOR) ?? 'Unknown';
+        const year = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.YEAR) ?? '';
+        return `${title} (${author} ${year})`;
     }
 
     onChooseItem(file: TFile, evt: MouseEvent | KeyboardEvent) {
@@ -54,7 +56,11 @@ export class BibEditModal extends Modal {
 		contentEl.empty();
 
         const metadata = this.app.metadataCache.getFileCache(this.literatureNote);
-        const title = parseFrontMatterEntry(metadata?.frontmatter, MyLiteratureFrontmatter.DISPLAY_NAMES)?.full ?? this.literatureNote.basename;
+        const frontmatter = metadata?.frontmatter;
+        const title = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.TITLE) ?? this.literatureNote.basename;
+        const author = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.AUTHOR) ?? 'Unknown';
+        const year = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.YEAR) ?? '';
+        const fullTitle =  `${title} (${author} ${year})`;
         const citekey = this.literatureNote.basename;
         const tagValidated = cbValidateBib(this.app, this.literatureNote);
 
@@ -78,7 +84,7 @@ export class BibEditModal extends Modal {
         const bibContents = await this.app.vault.cachedRead(bibfile);
 
         // Header
-        const headingEl = contentEl.createEl('h1', { text: title });
+        const headingEl = contentEl.createEl('h1', { text: fullTitle });
         headingEl.style.userSelect = 'text';
 
         const citekeyEl = contentEl.createEl('p', { text: 'Citekey: ' + citekey });

@@ -10,7 +10,6 @@ export enum MyLiteratureFrontmatter {
     IS_LITERATURE_NOTE = 'my_literature_note',
     PDF_PATH = 'pdf',
     BIB_PATH = 'bibtex',
-    DISPLAY_NAMES = 'display-titles',
     TITLE = 'title',
     AUTHOR = 'author',
     YEAR = 'year',

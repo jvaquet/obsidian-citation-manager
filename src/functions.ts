@@ -49,24 +49,28 @@ export const setBibPath = (app: App, literatureNote: TFile, bibPath: string) => 
     });
 }
 
-export function getLinkDisplayName(href: string, displayText: string, app: App) {
+export const getLinkDisplayName = (href: string, displayText: string, app: App) => {
 	// Get the note instance that best matches the given href
 	const noteFile = app.metadataCache.getFirstLinkpathDest(`${href}.md`, "");
-	if (!(noteFile instanceof TFile)) return;
+
+    if (!isLiteratureNote(app, noteFile))
+        return;
 
 	// Get the notes frontmatter from its metadata
-	const metadata = app.metadataCache.getFileCache(noteFile);
-	const frontmatter = metadata?.frontmatter;
-	if (!frontmatter) return;
+	const frontmatter = app.metadataCache.getFileCache(noteFile)?.frontmatter;
 
-	const displayTitles = frontmatter[MyLiteratureFrontmatter.DISPLAY_NAMES]
-	if (!displayTitles) return;
+    const title = parseFrontMatterEntry(frontmatter, 'title');
+    const author = parseFrontMatterEntry(frontmatter, 'author');
+    const year = parseFrontMatterEntry(frontmatter, 'year');
 
-	const displayTitle = displayTitles[displayText.substring(1)] ?? displayTitles['default'];
-	if (displayTitle) 
-		return displayTitle;
-
-	return displayText
+    switch(displayText) {
+        case '~full':
+            return `${title} (${author} ${year})`;
+        case '~title':
+            return title;
+        default:
+            return `${author} (${year})`;
+    }
 }
 
 export 	const getCitekey = (authors: any, year: number, title: string) => {
@@ -142,7 +146,7 @@ const queryBibtex = async (doi: string) => {
 }
 
 export const writeBib = async (app: App, doi: string, destination: string) => {
-
+    // TODO: Update citekey
     const bibContentPromise = queryBibtex(doi);
 
     const fileExists = app.vault.getFileByPath(destination);
