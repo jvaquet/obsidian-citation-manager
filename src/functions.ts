@@ -192,7 +192,7 @@ export const getHandleZoteroItem = (app: App) => async (event: CustomEvent) => {
     const { item, files, sessionID } = event.detail;
 
     const title = item.title;
-    const year = parseInt(item.date.split('-')[0])
+    const year = new Date(Date.parse(item.date)).getFullYear();
     const authors = item.creators.filter((creator: any) => creator.creatorType == 'author');
     const doi = item.DOI;
     const citekey = getCitekey(authors, year, title);
