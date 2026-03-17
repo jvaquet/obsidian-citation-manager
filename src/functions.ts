@@ -242,7 +242,7 @@ export const extractImageAnnotations = async (app: App, pdfPath: string) => {
     const pdf2annots = getPdf2AnnotsExecutable(app);
     const fullPdfPath = (app.vault.adapter as FileSystemAdapter).getFullPath(pdfPath);
 
-    const pdf2annotsResults = await execa(pdf2annots, ['-o', PATH_TMP, fullPdfPath]);
+    const pdf2annotsResults = await execa(pdf2annots, ['-o', PATH_TMP, '-d', '300', fullPdfPath]);
 
     const annotations = JSON.parse(pdf2annotsResults.stdout)
     const imageAnnotations = annotations.map((annotation: any) => {
