@@ -27,7 +27,7 @@ export enum CitationManagerPaths {
 
 export const getNewLiteratureNoteContents = (citekey: string, title: string) => `# [[${citekey}.pdf|${title}]]\n`
 
-export const getPdf2AnnotsExecutable = (app: App) => (app.vault.adapter as FileSystemAdapter).getFullPath('./.obsidian/plugins/obsidian-link-aliases/pdfannots2json');
+export const getPdf2AnnotsExecutable = (app: App) => (app.vault.adapter as FileSystemAdapter).getFullPath('./.obsidian/plugins/obsidian-citation-manager/pdfannots2json');
 
 export const PATH_TMP = '/tmp/obsidian';
 
