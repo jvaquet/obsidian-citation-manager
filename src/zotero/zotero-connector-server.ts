@@ -288,6 +288,7 @@ export class ConnectorServer {
         const expectedAttachmentIds = new Set<string>();
         (primaryItem.attachments || []).forEach((att: any) => {
             if (att.linkMode !== 'linked_url' && att.id) {
+                if (att.mimeType == 'application/pdf')
                 expectedAttachmentIds.add(att.id);
             }
         });
