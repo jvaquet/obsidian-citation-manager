@@ -7,7 +7,6 @@ import { getHandleZoteroAttachment, getHandleZoteroItem, getLinkDisplayName, wri
 import { ConnectorServer } from './zotero/zotero-connector-server';
 
 
-// TODO: Rename plugin
 export class CitationManagerPlugin extends Plugin {
 
 	zoteroServer: ConnectorServer;

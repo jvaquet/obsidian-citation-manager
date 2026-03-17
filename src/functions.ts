@@ -147,7 +147,7 @@ const queryBibtex = async (doi: string) => {
 	return bibtexContent;
 }
 
-export const writeBib = async (app: App, doi: string, destination: string) => {
+export const writeBib = async (app: App, doi: string, citekey: string, destination: string) => {
     // TODO: Update citekey
     const bibContentPromise = queryBibtex(doi);
 
@@ -159,8 +159,11 @@ export const writeBib = async (app: App, doi: string, destination: string) => {
     }
 
     const bibContent = await bibContentPromise;
+    const citekeyStart = bibContent.indexOf('{') + 1;
+    const citekeyEnd = bibContent.indexOf(',', citekeyStart) - 1;
+    const newBibContent = bibContent.substring(0, citekeyStart) + citekey + bibContent.substring(citekeyEnd+1);
 
-	await app.vault.create(destination, bibContent);
+	await app.vault.create(destination, newBibContent);
 }
 
 export const createNewLiteratureNote = async (app: App, newFrontmatter: any, destination: string, contents: string) => {
@@ -226,7 +229,7 @@ export const getHandleZoteroItem = (app: App) => async (event: CustomEvent) => {
     if(!noteWritten)
         return;
             
-    await writeBib(app, doi, bibtexPath);
+    await writeBib(app, doi, citekey, bibtexPath);
             
     if (pdfFile)
         await copyPdf(app, pdfFile, pdfPath);
