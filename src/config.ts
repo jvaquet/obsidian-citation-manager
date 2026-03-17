@@ -1,16 +1,16 @@
 import { App, FileSystemAdapter } from "obsidian";
 
 
-export enum MyLiteratureTags {
+export enum CitationManagerTags {
     BIB_VALIDATED = 'literature/bib-validated',
     UNREAD = 'literature/unread',
     READ = 'literature/read'
 };
 
-export enum MyLiteratureFrontmatter {
-    IS_LITERATURE_NOTE = 'my_literature_note',
+export enum CitationManagerFrontmatter {
+    IS_LITERATURE_NOTE = 'literature_note',
     PDF_PATH = 'pdf',
-    BIB_PATH = 'bibtex',
+    BIB_PATH = 'bib',
     TITLE = 'title',
     AUTHOR = 'author',
     YEAR = 'year',
@@ -18,11 +18,11 @@ export enum MyLiteratureFrontmatter {
     AUTHORS = 'authors'
 }
 
-export enum MyLiteraturePaths {
-    NOTES = 'literature',
-    PDFS = 'literature/attachments/pdf',
-    BIB = 'literature/attachments/bib',
-    JPG = 'literature/attachments/figures'
+export enum CitationManagerPaths {
+    NOTES = '20 Literature',
+    PDFS = '20 Literature/attachments/pdf',
+    BIB = '20 Literature/attachments/bib',
+    JPG = '20 Literature/attachments/figures'
 }
 
 export const getNewLiteratureNoteContents = (citekey: string, title: string) => `# [[${citekey}.pdf|${title}]]\n`

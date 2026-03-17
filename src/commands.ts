@@ -1,8 +1,8 @@
 import { Command, App, parseFrontMatterEntry, parseFrontMatterTags, Modal, Editor, MarkdownView, MarkdownFileInfo } from 'obsidian';
 import { PDFSelectionModal, BibEditModal, chainBibEditModals, ExportCitationModal } from 'src/modals';
 import { collectBacklinkMentions, getLinkedLiteratureNotes, importPDFFigures, isLiteratureNote, openPDFExternal } from 'src/functions';
-import { MyLiteratureTags, MyLiteratureFrontmatter } from './config';
-import { SmartLinkAliasPlugin } from './plugin';
+import { CitationManagerTags, CitationManagerFrontmatter } from './config';
+import { CitationManagerPlugin } from './plugin';
 
 
 export const commandMarkPaperRead : (app: App) => Command = (app) => { 
@@ -18,15 +18,15 @@ export const commandMarkPaperRead : (app: App) => Command = (app) => {
 			const frontmatter = app.metadataCache.getFileCache(activeFile)?.frontmatter;
 			const tags = parseFrontMatterTags(frontmatter) ?? [];
             
-			const isRead = tags.includes('#' + MyLiteratureTags.READ);
+			const isRead = tags.includes('#' + CitationManagerTags.READ);
 
 			if (checking)
 				return !isRead;
 
             app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
                 const tags = frontmatter.tags ?? [];
-                const newTags = tags.filter((t: string) => t !== MyLiteratureTags.UNREAD);
-                newTags.push(MyLiteratureTags.READ);
+                const newTags = tags.filter((t: string) => t !== CitationManagerTags.UNREAD);
+                newTags.push(CitationManagerTags.READ);
                 frontmatter.tags = newTags;
             })
             return true;
@@ -46,15 +46,15 @@ export const commandMarkPaperUnread : (app: App) => Command = (app) => {
 
 			const frontmatter = app.metadataCache.getFileCache(activeFile)?.frontmatter;
 			const tags = parseFrontMatterTags(frontmatter) ?? [];
-			const isUnread = tags.includes('#' + MyLiteratureTags.UNREAD);
+			const isUnread = tags.includes('#' + CitationManagerTags.UNREAD);
 
 			if (checking)
 				return !isUnread;
 
 			app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
 				const tags = frontmatter.tags ?? [];
-				const newTags = tags.filter((t: string) => t !== MyLiteratureTags.READ);
-				newTags.push(MyLiteratureTags.UNREAD);
+				const newTags = tags.filter((t: string) => t !== CitationManagerTags.READ);
+				newTags.push(CitationManagerTags.UNREAD);
 				frontmatter.tags = newTags;
 			});
 
@@ -75,7 +75,7 @@ export const commandOpenPaperPDF : (app: App) => Command = (app) => {
                     return true;
 
                 const metadata = app.metadataCache.getFileCache(activeFile);
-                const pdfPath = parseFrontMatterEntry(metadata?.frontmatter, MyLiteratureFrontmatter.PDF_PATH);
+                const pdfPath = parseFrontMatterEntry(metadata?.frontmatter, CitationManagerFrontmatter.PDF_PATH);
                 openPDFExternal(app, pdfPath);
             }
 
@@ -104,7 +104,7 @@ export const commandOpenBib : (app : App) => Command = (app) => {
                 return true;
 
             const metadata = app.metadataCache.getFileCache(activeFile);
-            const bibPath = parseFrontMatterEntry(metadata?.frontmatter, MyLiteratureFrontmatter.BIB_PATH);
+            const bibPath = parseFrontMatterEntry(metadata?.frontmatter, CitationManagerFrontmatter.BIB_PATH);
 			const bibfile = app.vault.getFileByPath(bibPath);
             if (bibfile)
 			    app.workspace.getLeaf(true).openFile(bibfile);
@@ -153,7 +153,7 @@ export const commandCheckBib : (app : App) => Command = (app) => {
                 const frontmatter = app.metadataCache.getFileCache(literatureNote)?.frontmatter;
                 const tags = parseFrontMatterTags(frontmatter) ?? [];
                 console.log(tags)
-                return !tags.contains(`#${MyLiteratureTags.BIB_VALIDATED}`);
+                return !tags.contains(`#${CitationManagerTags.BIB_VALIDATED}`);
             });
 
             if (literatureNotes.length == 0)
@@ -184,7 +184,7 @@ export const commandExportBib : (app : App) => Command = (app) => {
             new Promise(async (resolve) => {
                 const bibliographyEntries = await Promise.all(linkedLiteratureNotes.map(async (literatureNote) => {
                     const frontmatter = app.metadataCache.getFileCache(literatureNote)?.frontmatter;
-                    const bibPath = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.BIB_PATH);
+                    const bibPath = parseFrontMatterEntry(frontmatter, CitationManagerFrontmatter.BIB_PATH);
                     const bibfile = app.vault.getFileByPath(bibPath);
                     if (!bibfile)
                         return '';
@@ -204,7 +204,7 @@ export const commandExportBib : (app : App) => Command = (app) => {
 	}
 }
 
-export const commandZoteroServerStart : (plugin : SmartLinkAliasPlugin) => Command = (plugin) => {
+export const commandZoteroServerStart : (plugin : CitationManagerPlugin) => Command = (plugin) => {
     return {
 		id: 'zotero-server-start',
 		name: 'Zotero Start',
@@ -216,7 +216,7 @@ export const commandZoteroServerStart : (plugin : SmartLinkAliasPlugin) => Comma
 	}
 }
 
-export const commandZoteroServerStop : (plugin : SmartLinkAliasPlugin) => Command = (plugin) => {
+export const commandZoteroServerStop : (plugin : CitationManagerPlugin) => Command = (plugin) => {
 	return {
 		id: 'zotero-server-stop',
 		name: 'Zotero Stop',

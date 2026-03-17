@@ -1,5 +1,5 @@
 import { App, CachedMetadata, Editor, FileSystemAdapter, TFile, parseFrontMatterEntry } from 'obsidian';
-import { getNewLiteratureNoteContents, getPdf2AnnotsExecutable, MyLiteratureFrontmatter, MyLiteraturePaths, MyLiteratureTags, PATH_TMP, SECTION_HEADER_FIGURES, SECTION_HEADER_MENTIONS } from './config';
+import { getNewLiteratureNoteContents, getPdf2AnnotsExecutable, CitationManagerFrontmatter, CitationManagerPaths, CitationManagerTags, PATH_TMP, SECTION_HEADER_FIGURES, SECTION_HEADER_MENTIONS } from './config';
 
 import * as fs from "fs/promises";
 import { confirmOverride } from './modals';
@@ -18,7 +18,7 @@ export const isLiteratureNote = (app: App, file: TFile | null) : file is TFile =
         return false;
 
     const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
-    const isLiteratureNote : boolean = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.IS_LITERATURE_NOTE);
+    const isLiteratureNote : boolean = parseFrontMatterEntry(frontmatter, CitationManagerFrontmatter.IS_LITERATURE_NOTE);
     return isLiteratureNote;
 }
 
@@ -40,8 +40,8 @@ export const getLinkedLiteratureNotes = (app: App, file: TFile | null) => {
 export const cbValidateBib = (app: App, literatureNote: TFile) => () => {
     app.fileManager.processFrontMatter(literatureNote, (frontmatter) => {
         const tags = frontmatter.tags ?? [];
-        if (!tags.contains(MyLiteratureTags.BIB_VALIDATED))
-            frontmatter.tags.push(MyLiteratureTags.BIB_VALIDATED);
+        if (!tags.contains(CitationManagerTags.BIB_VALIDATED))
+            frontmatter.tags.push(CitationManagerTags.BIB_VALIDATED);
     });
 }
 
@@ -194,9 +194,9 @@ export const getHandleZoteroItem = (app: App) => async (event: CustomEvent) => {
     const doi = item.DOI;
     const citekey = getCitekey(authors, year, title);
 
-    const literatureNotePath = `${MyLiteraturePaths.NOTES}/${citekey}.md`;
-    const bibtexPath = `${MyLiteraturePaths.BIB}/${citekey}.bib`;
-    const pdfPath = `${MyLiteraturePaths.PDFS}/${citekey}.pdf`;
+    const literatureNotePath = `${CitationManagerPaths.NOTES}/${citekey}.md`;
+    const bibtexPath = `${CitationManagerPaths.BIB}/${citekey}.bib`;
+    const pdfPath = `${CitationManagerPaths.PDFS}/${citekey}.pdf`;
 
     const newLiteratureNoteContents = getNewLiteratureNoteContents(citekey, title);
 
@@ -209,15 +209,15 @@ export const getHandleZoteroItem = (app: App) => async (event: CustomEvent) => {
     )
 
     const newFrontmatter = {
-        [MyLiteratureFrontmatter.IS_LITERATURE_NOTE]: true,
-        [MyLiteratureFrontmatter.BIB_PATH]: bibtexPath,
-        [MyLiteratureFrontmatter.PDF_PATH]: pdfPath,
-        [MyLiteratureFrontmatter.TITLE]: title,
-        [MyLiteratureFrontmatter.AUTHOR]: frontmatterAuthor,
-        [MyLiteratureFrontmatter.YEAR]: year,
-        [MyLiteratureFrontmatter.DOI]: doi,
-        [MyLiteratureFrontmatter.AUTHORS]: frontmatterAuthorLinks,
-        tags: [MyLiteratureTags.UNREAD]
+        [CitationManagerFrontmatter.IS_LITERATURE_NOTE]: true,
+        [CitationManagerFrontmatter.BIB_PATH]: bibtexPath,
+        [CitationManagerFrontmatter.PDF_PATH]: pdfPath,
+        [CitationManagerFrontmatter.TITLE]: title,
+        [CitationManagerFrontmatter.AUTHOR]: frontmatterAuthor,
+        [CitationManagerFrontmatter.YEAR]: year,
+        [CitationManagerFrontmatter.DOI]: doi,
+        [CitationManagerFrontmatter.AUTHORS]: frontmatterAuthorLinks,
+        tags: [CitationManagerTags.UNREAD]
     }
 
     const pdfFile = files.filter((file: string) => file.endsWith('.pdf'))[0];
@@ -298,10 +298,10 @@ export const replaceEditorSection = (editor: Editor, metadata: CachedMetadata | 
 
 export const importPDFFigures = async (app: App, editor: Editor, activeFile: TFile) => {
     const metadata = app.metadataCache.getFileCache(activeFile);
-    const pdfPath = parseFrontMatterEntry(metadata?.frontmatter, MyLiteratureFrontmatter.PDF_PATH);
+    const pdfPath = parseFrontMatterEntry(metadata?.frontmatter, CitationManagerFrontmatter.PDF_PATH);
 
     const imageAnnotations = await extractImageAnnotations(app, pdfPath);
-    const imageAttachmentsPath = path.join(MyLiteraturePaths.JPG, activeFile.basename);
+    const imageAttachmentsPath = path.join(CitationManagerPaths.JPG, activeFile.basename);
 
     await createFolderIfNotExists(app, imageAttachmentsPath);
 
@@ -309,7 +309,7 @@ export const importPDFFigures = async (app: App, editor: Editor, activeFile: TFi
     for (let imageAnnotation of imageAnnotations) {
 
         const imgFileName = imageAnnotation.imagePath.split('/').at(-1);
-        const imgFilePath = path.join(MyLiteraturePaths.JPG, activeFile.basename, imgFileName);
+        const imgFilePath = path.join(CitationManagerPaths.JPG, activeFile.basename, imgFileName);
         const imgFile = await copyFileToVault(app, imageAnnotation.imagePath, imgFilePath, true);
 
         const imgText = imageAnnotation?.comment?.replace("\\", "\n") ?? 'Figure';

@@ -1,6 +1,6 @@
 import { App, ButtonComponent, FuzzySuggestModal, Modal, parseFrontMatterEntry, Setting, TextAreaComponent, TextComponent, TFile } from "obsidian";
 import { cbValidateBib, openPDFExternal, setBibPath } from 'src/functions';
-import { MyLiteratureFrontmatter, MyLiteraturePaths } from "./config";
+import { CitationManagerFrontmatter, CitationManagerPaths } from "./config";
 
 
 export class PDFSelectionModal extends FuzzySuggestModal<TFile> {
@@ -18,15 +18,15 @@ export class PDFSelectionModal extends FuzzySuggestModal<TFile> {
 
     getItemText(file: TFile): string {
         const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-        const title = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.TITLE) ?? file.basename;
-        const author = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.AUTHOR) ?? 'Unknown';
-        const year = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.YEAR) ?? '';
+        const title = parseFrontMatterEntry(frontmatter, CitationManagerFrontmatter.TITLE) ?? file.basename;
+        const author = parseFrontMatterEntry(frontmatter, CitationManagerFrontmatter.AUTHOR) ?? 'Unknown';
+        const year = parseFrontMatterEntry(frontmatter, CitationManagerFrontmatter.YEAR) ?? '';
         return `${title} (${author} ${year})`;
     }
 
     onChooseItem(file: TFile, evt: MouseEvent | KeyboardEvent) {
         const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-        const pdfPath = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.PDF_PATH);
+        const pdfPath = parseFrontMatterEntry(frontmatter, CitationManagerFrontmatter.PDF_PATH);
         openPDFExternal(this.app, pdfPath);
     }
 }
@@ -57,18 +57,18 @@ export class BibEditModal extends Modal {
 
         const metadata = this.app.metadataCache.getFileCache(this.literatureNote);
         const frontmatter = metadata?.frontmatter;
-        const title = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.TITLE) ?? this.literatureNote.basename;
-        const author = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.AUTHOR) ?? 'Unknown';
-        const year = parseFrontMatterEntry(frontmatter, MyLiteratureFrontmatter.YEAR) ?? '';
+        const title = parseFrontMatterEntry(frontmatter, CitationManagerFrontmatter.TITLE) ?? this.literatureNote.basename;
+        const author = parseFrontMatterEntry(frontmatter, CitationManagerFrontmatter.AUTHOR) ?? 'Unknown';
+        const year = parseFrontMatterEntry(frontmatter, CitationManagerFrontmatter.YEAR) ?? '';
         const fullTitle =  `${title} (${author} ${year})`;
         const citekey = this.literatureNote.basename;
         const tagValidated = cbValidateBib(this.app, this.literatureNote);
 
 
 
-        let bibPath: string | null = parseFrontMatterEntry(metadata?.frontmatter, MyLiteratureFrontmatter.BIB_PATH);
+        let bibPath: string | null = parseFrontMatterEntry(metadata?.frontmatter, CitationManagerFrontmatter.BIB_PATH);
         if (!bibPath) {
-            bibPath = MyLiteraturePaths.BIB + '/' + citekey + '.bib';
+            bibPath = CitationManagerPaths.BIB + '/' + citekey + '.bib';
             setBibPath(this.app, this.literatureNote, bibPath);
         }
 

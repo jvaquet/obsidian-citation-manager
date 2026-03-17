@@ -8,7 +8,7 @@ import { ConnectorServer } from './zotero/zotero-connector-server';
 
 
 // TODO: Rename plugin
-export class SmartLinkAliasPlugin extends Plugin {
+export class CitationManagerPlugin extends Plugin {
 
 	zoteroServer: ConnectorServer;
 

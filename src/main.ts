@@ -1,4 +1,4 @@
-import { SmartLinkAliasPlugin } from "./plugin";
+import { CitationManagerPlugin } from "./plugin";
 
 
-export default SmartLinkAliasPlugin;
+export default CitationManagerPlugin;
