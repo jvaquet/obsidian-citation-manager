@@ -220,6 +220,7 @@ export const getHandleZoteroItem = (app: App) => async (event: CustomEvent) => {
         [CitationManagerFrontmatter.YEAR]: year,
         [CitationManagerFrontmatter.DOI]: doi,
         [CitationManagerFrontmatter.AUTHORS]: frontmatterAuthorLinks,
+        aliases: [title],
         tags: [CitationManagerTags.UNREAD]
     }
 
