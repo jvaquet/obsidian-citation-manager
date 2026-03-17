@@ -1,6 +1,6 @@
 import { Command, App, parseFrontMatterEntry, parseFrontMatterTags, Modal, Editor, MarkdownView, MarkdownFileInfo } from 'obsidian';
 import { PDFSelectionModal, BibEditModal, chainBibEditModals, ExportCitationModal } from 'src/modals';
-import { getLinkedLiteratureNotes, importPDFFigures, isLiteratureNote, openPDFExternal } from 'src/functions';
+import { collectBacklinkMentions, getLinkedLiteratureNotes, importPDFFigures, isLiteratureNote, openPDFExternal } from 'src/functions';
 import { MyLiteratureTags, MyLiteratureFrontmatter } from './config';
 import { SmartLinkAliasPlugin } from './plugin';
 
@@ -243,6 +243,24 @@ export const commandImportPDFFigures : (app : App) => Command = (app) => {
                 return true;
 
             importPDFFigures(app, editor, activeFile);
+		}
+    }
+}
+
+export const commandCollectMentions : (app : App) => Command = (app) => {
+    return {
+		id: 'collect-backlinks',
+		name: 'Collect Backlink Notes',
+		editorCheckCallback: (checking: boolean, editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
+            const activeFile = app.workspace.getActiveFile();
+            
+            if (!isLiteratureNote(app, activeFile))
+                return false;
+
+            if (checking)
+                return true;
+
+            collectBacklinkMentions(app, editor, activeFile);
 		}
     }
 }

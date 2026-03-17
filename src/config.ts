@@ -32,3 +32,4 @@ export const getPdf2AnnotsExecutable = (app: App) => (app.vault.adapter as FileS
 export const PATH_TMP = '/tmp/obsidian';
 
 export const SECTION_HEADER_FIGURES = 'Figures';
+export const SECTION_HEADER_MENTIONS = 'Mentions';

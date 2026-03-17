@@ -1,5 +1,5 @@
 import { App, CachedMetadata, Editor, FileSystemAdapter, TFile, parseFrontMatterEntry } from 'obsidian';
-import { getNewLiteratureNoteContents, getPdf2AnnotsExecutable, MyLiteratureFrontmatter, MyLiteraturePaths, MyLiteratureTags, PATH_TMP, SECTION_HEADER_FIGURES } from './config';
+import { getNewLiteratureNoteContents, getPdf2AnnotsExecutable, MyLiteratureFrontmatter, MyLiteraturePaths, MyLiteratureTags, PATH_TMP, SECTION_HEADER_FIGURES, SECTION_HEADER_MENTIONS } from './config';
 
 import * as fs from "fs/promises";
 import { confirmOverride } from './modals';
@@ -318,4 +318,40 @@ export const importPDFFigures = async (app: App, editor: Editor, activeFile: TFi
     }
 
     replaceEditorSection(editor, metadata, SECTION_HEADER_FIGURES, 2, newFiguresSection);
+}
+
+export const collectBacklinkMentions = async (app: App, editor: Editor, activeFile: TFile) => {
+    //@ts-ignore
+    const backlinks = app.metadataCache.getBacklinksForFile(activeFile);
+
+    let backlinkMentionsSection = '## Mentions\n';
+
+    for (let key of backlinks.keys()) {
+        const curFile = app.vault.getFileByPath(key);
+        if (!curFile)
+            continue;
+        const curHeadings = app.metadataCache.getFileCache(curFile)?.headings ?? [];
+        const curFileContents = await app.vault.read(curFile);
+
+        let curBacklinkComments = '';
+
+        for (let idx = 0; idx < curHeadings.length; idx++) {
+            if (curHeadings[idx].heading.contains(activeFile.basename)) {
+                const start = curHeadings[idx].position.end.offset;
+                const end = curHeadings[idx+1]?.position?.start?.offset ?? curFileContents.length;
+                const section = curFileContents.substring(start, end)
+
+                curBacklinkComments += section;
+            }
+        }
+                
+        if (curBacklinkComments) {
+            backlinkMentionsSection += `### [[${curFile.basename}]]${curBacklinkComments}\n`
+        }
+
+    }
+
+
+    const metadata = app.metadataCache.getFileCache(activeFile);
+    replaceEditorSection(editor, metadata, SECTION_HEADER_MENTIONS, 2, backlinkMentionsSection)
 }

@@ -2,7 +2,7 @@ import { Plugin } from 'obsidian';
 import { getLinkDecorationsStateField } from './link-decorations.field';
 import { Prec } from '@codemirror/state';
 
-import { commandCheckBib, commandExportBib, commandImportPDFFigures, commandMarkPaperRead, commandMarkPaperUnread, commandOpenBib, commandOpenPaperPDF, commandUpdateBib, commandZoteroServerStart, commandZoteroServerStop } from 'src/commands'
+import { commandCheckBib, commandCollectMentions, commandExportBib, commandImportPDFFigures, commandMarkPaperRead, commandMarkPaperUnread, commandOpenBib, commandOpenPaperPDF, commandUpdateBib, commandZoteroServerStart, commandZoteroServerStop } from 'src/commands'
 import { getHandleZoteroAttachment, getHandleZoteroItem, getLinkDisplayName, writeBib } from './functions';
 import { ConnectorServer } from './zotero/zotero-connector-server';
 
@@ -40,6 +40,7 @@ export class SmartLinkAliasPlugin extends Plugin {
 		this.addCommand(commandCheckBib(this.app))
 		this.addCommand(commandExportBib(this.app))
 		this.addCommand(commandImportPDFFigures(this.app))
+		this.addCommand(commandCollectMentions(this.app))
 
 		this.addCommand(commandZoteroServerStart(this))
 		this.addCommand(commandZoteroServerStop(this))
