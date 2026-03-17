@@ -1,6 +1,6 @@
-import { Command, App, parseFrontMatterEntry, parseFrontMatterTags, Modal } from 'obsidian';
+import { Command, App, parseFrontMatterEntry, parseFrontMatterTags, Modal, Editor, MarkdownView, MarkdownFileInfo } from 'obsidian';
 import { PDFSelectionModal, BibEditModal, chainBibEditModals, ExportCitationModal } from 'src/modals';
-import { getLinkedLiteratureNotes, isLiteratureNote, openPDFExternal } from 'src/functions';
+import { getLinkedLiteratureNotes, importPDFFigures, isLiteratureNote, openPDFExternal } from 'src/functions';
 import { MyLiteratureTags, MyLiteratureFrontmatter } from './config';
 import { SmartLinkAliasPlugin } from './plugin';
 
@@ -226,4 +226,23 @@ export const commandZoteroServerStop : (plugin : SmartLinkAliasPlugin) => Comman
 			plugin.zoteroServer.stop();
 		}
 	}
+}
+
+
+export const commandImportPDFFigures : (app : App) => Command = (app) => {
+    return {
+		id: 'import-pdf-figures',
+		name: 'Import PDF figures',
+		editorCheckCallback: (checking: boolean, editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
+            const activeFile = app.workspace.getActiveFile();
+            
+            if (!isLiteratureNote(app, activeFile))
+                return false;
+
+            if (checking)
+                return true;
+
+            importPDFFigures(app, editor, activeFile);
+		}
+    }
 }

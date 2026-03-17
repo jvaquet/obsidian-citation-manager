@@ -1,9 +1,11 @@
-import { App, TFile, parseFrontMatterEntry } from 'obsidian';
-import { getNewLiteratureNoteContents, MyLiteratureFrontmatter, MyLiteraturePaths, MyLiteratureTags } from './config';
+import { App, CachedMetadata, Editor, FileSystemAdapter, TFile, parseFrontMatterEntry } from 'obsidian';
+import { getNewLiteratureNoteContents, getPdf2AnnotsExecutable, MyLiteratureFrontmatter, MyLiteraturePaths, MyLiteratureTags, PATH_TMP, SECTION_HEADER_FIGURES } from './config';
 
 import * as fs from "fs/promises";
 import { confirmOverride } from './modals';
 import { request } from 'https';
+import { execa } from 'execa';
+import * as path from 'path';
 
 export const openPDFExternal = (app: App, path: string) => {
     const pdfFile = app.vault.getFileByPath(path);
@@ -231,3 +233,89 @@ export const getHandleZoteroItem = (app: App) => async (event: CustomEvent) => {
 }
 
 export const getHandleZoteroAttachment = (app: App) => async (event: CustomEvent) => {}
+
+export const extractImageAnnotations = async (app: App, pdfPath: string) => {
+    const pdf2annots = getPdf2AnnotsExecutable(app);
+    const fullPdfPath = (app.vault.adapter as FileSystemAdapter).getFullPath(pdfPath);
+
+    const pdf2annotsResults = await execa(pdf2annots, ['-o', PATH_TMP, fullPdfPath]);
+
+    const annotations = JSON.parse(pdf2annotsResults.stdout)
+    const imageAnnotations = annotations.map((annotation: any) => {
+        return {
+            comment: annotation.comment,
+            imagePath: annotation.imagePath
+        }
+    }).filter((annotation: any) => annotation.imagePath);
+
+    return imageAnnotations;
+}
+
+export const createFolderIfNotExists = async (app: App, path: string) => {
+    if(!app.vault.getFolderByPath(path))
+        await app.vault.createFolder(path);
+}
+
+export const copyFileToVault = async (app: App, source: string, destination: string, overwrite: boolean) => {
+
+    
+    const existingFile = app.vault.getFileByPath(destination);
+    if (existingFile) {
+        if (overwrite)
+            await app.vault.delete(existingFile);
+        else
+            return null;
+    }
+    
+    const data = await fs.readFile(source);
+    // @ts-ignore
+    const createdFile = await app.vault.createBinary(destination, data);
+    return createdFile;
+}
+
+export const replaceEditorSection = (editor: Editor, metadata: CachedMetadata | null, heading: string, headingLevel: number, newContents: string) => {
+    const headings = metadata?.headings ?? [];
+    const headingsLevel = headings.filter((heading) => heading.level == headingLevel);
+    const oldText = editor.getValue();
+
+    let offsetFrom = null;
+    let offsetTo = null;
+
+    for (let i = 0; i < headingsLevel.length; i++) {
+        if (headingsLevel[i].heading == heading) {
+            offsetFrom = headingsLevel[i].position.start.offset
+            offsetTo = headingsLevel[i+1]?.position?.start?.offset ?? oldText.length;
+        }
+    }
+
+    if (offsetFrom && offsetTo) {
+        editor.replaceRange(newContents, editor.offsetToPos(offsetFrom), editor.offsetToPos(offsetTo), 'Import Figures');
+    } else {
+        const newText = oldText + '\n' + newContents;
+        editor.setValue(newText);
+    }
+}
+
+export const importPDFFigures = async (app: App, editor: Editor, activeFile: TFile) => {
+    const metadata = app.metadataCache.getFileCache(activeFile);
+    const pdfPath = parseFrontMatterEntry(metadata?.frontmatter, MyLiteratureFrontmatter.PDF_PATH);
+
+    const imageAnnotations = await extractImageAnnotations(app, pdfPath);
+    const imageAttachmentsPath = path.join(MyLiteraturePaths.JPG, activeFile.basename);
+
+    await createFolderIfNotExists(app, imageAttachmentsPath);
+
+    let newFiguresSection = `## ${SECTION_HEADER_FIGURES}\n`
+    for (let imageAnnotation of imageAnnotations) {
+
+        const imgFileName = imageAnnotation.imagePath.split('/').at(-1);
+        const imgFilePath = path.join(MyLiteraturePaths.JPG, activeFile.basename, imgFileName);
+        const imgFile = await copyFileToVault(app, imageAnnotation.imagePath, imgFilePath, true);
+
+        const imgText = imageAnnotation?.comment?.replace("\\", "\n") ?? 'Figure';
+
+        newFiguresSection += `### ${imgText}\n![[${imgFile?.path}]]\n`;
+    }
+
+    replaceEditorSection(editor, metadata, SECTION_HEADER_FIGURES, 2, newFiguresSection);
+}
