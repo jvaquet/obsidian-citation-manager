@@ -34,7 +34,7 @@ export const getLinkedLiteratureNotes = (app: App, file: TFile | null) => {
         .filter((linkedFile) => linkedFile != null)
         .filter((linkedFile) => isLiteratureNote(app, linkedFile));
 
-    return linkedLiteratureNotes;
+    return linkedLiteratureNotes as TFile[];
 }
 
 export const cbValidateBib = (app: App, literatureNote: TFile) => () => {
