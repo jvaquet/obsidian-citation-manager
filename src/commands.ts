@@ -7,8 +7,8 @@ import { CitationManagerPlugin } from './plugin';
 
 export const commandMarkPaperRead : (app: App) => Command = (app) => { 
     return {
-        id: 'mark-read',
-        name: 'Mark Paper as Read',
+        id: 'citation-manager-mark-read',
+        name: 'Mark paper as read',
         checkCallback: (checking) => {
 			const activeFile = app.workspace.getActiveFile();
             
@@ -36,8 +36,8 @@ export const commandMarkPaperRead : (app: App) => Command = (app) => {
 
 export const commandMarkPaperUnread : (app: App) => Command = (app) => {
     return {
-		id: 'mark-unread',
-		name: 'Mark Paper as Unread',
+		id: 'citation-manager-mark-unread',
+		name: 'Mark paper as unread',
 		checkCallback: (checking) => {
 			const activeFile = app.workspace.getActiveFile();
             
@@ -65,8 +65,8 @@ export const commandMarkPaperUnread : (app: App) => Command = (app) => {
 
 export const commandOpenPaperPDF : (app: App) => Command = (app) => { 
     return {
-		id: 'open-pdf',
-		name: 'Open PDF',
+		id: 'citation-manager-open-pdf',
+		name: 'Open paper PDF',
 		checkCallback: (checking) => {
 			const activeFile = app.workspace.getActiveFile();
             
@@ -92,8 +92,8 @@ export const commandOpenPaperPDF : (app: App) => Command = (app) => {
 
 export const commandOpenBib : (app : App) => Command = (app) => {
     return {
-		id: 'open-bib',
-		name: 'Open bib',
+		id: 'citation-manager-open-bib',
+		name: 'Open paper bib citation',
 		checkCallback: (checking) => {
             const activeFile = app.workspace.getActiveFile();
             
@@ -114,8 +114,8 @@ export const commandOpenBib : (app : App) => Command = (app) => {
 
 export const commandUpdateBib : (app : App) => Command = (app) => {
     return {
-		id: 'update-bib',
-		name: 'Update bib Citation',
+		id: 'citation-manager-update-bib',
+		name: 'Update paper bib citation',
 		checkCallback: (checking) => {
             const activeFile = app.workspace.getActiveFile();
             
@@ -134,8 +134,8 @@ export const commandUpdateBib : (app : App) => Command = (app) => {
 
 export const commandCheckBib : (app : App) => Command = (app) => {
     return {
-		id: 'check-citations',
-		name: 'Check Citations',
+		id: 'citation-manager-check-citations',
+		name: 'Check bib citations',
 		checkCallback: (checking) => {
             const activeFile = app.workspace.getActiveFile();
 
@@ -169,8 +169,8 @@ export const commandCheckBib : (app : App) => Command = (app) => {
 
 export const commandExportBib : (app : App) => Command = (app) => {
     return {
-		id: 'export-citations',
-		name: 'Export Citations',
+		id: 'citation-manager-export-citations',
+		name: 'Export bib citations',
 		checkCallback: (checking) => {
             const activeFile = app.workspace.getActiveFile();
 
@@ -206,8 +206,8 @@ export const commandExportBib : (app : App) => Command = (app) => {
 
 export const commandZoteroServerStart : (plugin : CitationManagerPlugin) => Command = (plugin) => {
     return {
-		id: 'zotero-server-start',
-		name: 'Zotero Start',
+		id: 'citation-manager-zotero-server-start',
+		name: 'Zotero server start',
 		checkCallback: (checking) => {
 			if (checking)
 				return !plugin.zoteroServer.running;
@@ -218,8 +218,8 @@ export const commandZoteroServerStart : (plugin : CitationManagerPlugin) => Comm
 
 export const commandZoteroServerStop : (plugin : CitationManagerPlugin) => Command = (plugin) => {
 	return {
-		id: 'zotero-server-stop',
-		name: 'Zotero Stop',
+		id: 'citation-manager-zotero-server-stop',
+		name: 'Zotero server stop',
 		checkCallback: (checking) => {
 			if (checking)
 				return plugin.zoteroServer.running;
@@ -231,8 +231,8 @@ export const commandZoteroServerStop : (plugin : CitationManagerPlugin) => Comma
 
 export const commandImportPDFFigures : (app : App) => Command = (app) => {
     return {
-		id: 'import-pdf-figures',
-		name: 'Import PDF figures',
+		id: 'citation-manager-import-pdf-figures',
+		name: 'Import figures from paper PDF',
 		editorCheckCallback: (checking: boolean, editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
             const activeFile = app.workspace.getActiveFile();
             
@@ -249,8 +249,8 @@ export const commandImportPDFFigures : (app : App) => Command = (app) => {
 
 export const commandCollectMentions : (app : App) => Command = (app) => {
     return {
-		id: 'collect-backlinks',
-		name: 'Collect Backlink Notes',
+		id: 'citation-manager-collect-backlinks',
+		name: 'Collect paper backlink mentions',
 		editorCheckCallback: (checking: boolean, editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
             const activeFile = app.workspace.getActiveFile();
             
